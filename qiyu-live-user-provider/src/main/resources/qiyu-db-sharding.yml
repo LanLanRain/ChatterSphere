@@ -1,0 +1,38 @@
+# 配置数据源信息
+dataSources:
+  user:  ## 新表，重建的分表
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource  # 数据源类名称
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL驱动类名称
+    jdbcUrl: jdbc:mysql://123.60.49.130:3306/qiyu_live_user?useUnicode=true&characterEncoding=utf8  # 数据库连接URL
+    username: root  # 数据库用户名
+    password: mysql_1120  # 数据库密码
+    idle-timeout: 5  # 空闲超时时间，单位：分钟
+    minimum-idle: 100  # 最小空闲连接数
+    pool-name: qiyu-db-user  # 连接池名称
+    maximum-pool-size: 1000  # 最大连接池大小
+    connection-timeout: 60000  # 连接超时时间，单位：毫秒（增加到 60 秒）
+    connection-init-sql: SELECT 1  # 连接初始化SQL
+    connection-test-query: SELECT 1  # 连接测试查询SQL
+
+# 配置分库分表规则
+rules:
+  - !SINGLE  # 单库不分表规则
+    defaultDataSource: user  ## 不分表分分库的默认数据源
+  - !SHARDING  # 分库分表规则
+    tables:
+      t_user:  # 需要分表的表名称
+        actualDataNodes: user.t_user_${(0..99).collect(){it.toString().padLeft(2,'0')}}  # 实际数据节点，表示t_user表从0到99的分表
+        tableStrategy:
+          standard:
+            shardingColumn: user_id  # 分表字段
+            shardingAlgorithmName: t_user-inline  # 分表算法名称
+
+    shardingAlgorithms:  # 分表算法配置
+      t_user-inline:
+        type: INLINE  # 分表算法类型为内联
+        props:
+          algorithm-expression: t_user_${(user_id % 100).toString().padLeft(2,'0')}  # 分表表达式，根据user_id取模进行分表
+
+# 全局配置属性
+props:
+  sql-show: true  # 是否显示SQL，方便调试和监控
