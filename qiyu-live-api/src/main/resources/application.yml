@@ -1,0 +1,6 @@
+dubbo:
+  application:
+    name: qiyu-live-api
+    qos-enable: false
+  registry:
+    address: nacos://123.60.49.130:8848?namespace=qiyu-live-test
