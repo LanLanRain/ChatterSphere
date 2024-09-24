@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
  * @create 2024-09-23
  */
 public class RedisKeyBuilder {
+
     @Value("${spring.application.name}")
     private String applicationName; // 应用名，用作Redis键的前缀
+
     private static final String SPLIT_ITEM = ":"; // 定义Redis键中的分割符，用于分隔前缀和实际键名
 
     /**

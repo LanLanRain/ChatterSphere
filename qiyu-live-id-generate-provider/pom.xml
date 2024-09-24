@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.lb</groupId>
+        <artifactId>qiyu-live-app</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>qiyu-live-id-generate-provider</artifactId>
+
+    <properties>
+        <mybatis-plus.version>3.5.3</mybatis-plus.version>
+        <dubbo.version>3.2.0-beta.3</dubbo.version>
+    </properties>
+
+    <!-- 依赖管理部分 -->
+<dependencies>
+    <!-- MyBatis-Plus 依赖，提供了便捷的数据库操作功能 -->
+    <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>${mybatis-plus.version}</version>
+    </dependency>
+    <!-- Dubbo 依赖，用于实现 RPC 服务 -->
+    <dependency>
+        <groupId>org.apache.dubbo</groupId>
+        <artifactId>dubbo-spring-boot-starter</artifactId>
+        <version>${dubbo.version}</version>
+    </dependency>
+    <!-- Spring Boot Web 依赖，用于构建 Web 应用 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <exclusions>
+            <!-- 排除 log4j-to-slf4j 依赖，以避免冲突 -->
+            <exclusion>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <groupId>org.apache.logging.log4j</groupId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <!-- MySQL 数据库驱动 -->
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${qiyu-mysql.version}</version>
+    </dependency>
+    <!-- Spring Cloud Bootstrap 依赖，用于配置和引导 Spring Cloud 应用 -->
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        <version>3.0.2</version>
+    </dependency>
+    <!-- Nacos Config 依赖，用于从 Nacos 服务器获取配置信息 -->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    </dependency>
+    <!-- Nacos Discovery 依赖，用于从 Nacos 服务器发现服务实例 -->
+    <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    </dependency>
+    <!-- qiyu-live-id-generate-interface 依赖 -->
+    <dependency>
+        <groupId>com.lb</groupId>
+        <artifactId>qiyu-live-id-generate-interface</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <!-- qiyu-live-common-interface 依赖 -->
+    <dependency>
+        <groupId>com.lb</groupId>
+        <artifactId>qiyu-live-common-interface</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+
+
+
+</project>

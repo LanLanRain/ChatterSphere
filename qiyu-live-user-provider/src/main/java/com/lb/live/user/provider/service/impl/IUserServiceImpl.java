@@ -2,6 +2,7 @@ package com.lb.live.user.provider.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import com.lb.live.common.interfaces.topics.UserProviderTopicNames;
 import com.lb.live.common.interfaces.utils.ConvertBeanUtils;
 import com.lb.live.user.dto.UserCacheAsyncDeleteDTO;
 import com.lb.live.user.dto.UserDTO;
@@ -12,6 +13,7 @@ import com.lb.qiyu.live.framework.redis.starter.key.UserProviderCacheKeyBuilder;
 import jakarta.annotation.Resource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.rocketmq.client.producer.MQProducer;
+import org.apache.rocketmq.common.message.Message;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,8 +48,6 @@ public class IUserServiceImpl implements IUserService {
     @Resource
     private UserProviderCacheKeyBuilder userProviderCacheKeyBuilder;
 
-
-
     /**
      * 根据用户ID获取用户DTO信息
      * 该方法首先尝试从Redis缓存中获取用户信息，如果缓存中不存在，则从数据库中获取，并将结果存入缓存
@@ -57,31 +57,18 @@ public class IUserServiceImpl implements IUserService {
      */
     @Override
     public UserDTO getByUserId(Long userId) {
-        // 检查用户ID是否为null，如果是，则直接返回null
         if (userId == null) {
             return null;
         }
-
-        // 生成Redis缓存的键
-        String key = "userinfo:" + userId;
-
-        // 尝试从Redis缓存中获取用户DTO对象
+        String key = userProviderCacheKeyBuilder.buildUserInfoKey(userId);
         UserDTO userDTO = (UserDTO) redisTemplate.opsForValue().get(key);
-
-        // 如果缓存中存在该用户信息，则直接返回
         if (userDTO != null) {
             return userDTO;
         }
-
-        // 如果缓存中不存在，则从数据库中查询用户信息
         userDTO = ConvertBeanUtils.convert(userMapper.selectById(userId), UserDTO.class);
-
-        // 如果查询到用户信息，则将用户信息存入Redis缓存
         if (userDTO != null) {
             redisTemplate.opsForValue().set(key, userDTO);
         }
-
-        // 返回用户DTO对象，如果数据库中不存在则返回null
         return userDTO;
     }
 
@@ -94,13 +81,22 @@ public class IUserServiceImpl implements IUserService {
         if (updateStatus > -1) {
             String key = userProviderCacheKeyBuilder.buildUserInfoKey(userDTO.getUserId());
             redisTemplate.delete(key);
-
             UserCacheAsyncDeleteDTO userCacheAsyncDeleteDTO = new UserCacheAsyncDeleteDTO();
             Map<String, Object> jsonParam = new HashMap<>();
             jsonParam.put("userId", userDTO.getUserId());
             userCacheAsyncDeleteDTO.setJson(JSON.toJSONString(jsonParam));
+            try {
+                Message message = new Message();
+                message.setBody(JSON.toJSONString(userDTO).getBytes());
+                message.setTopic(UserProviderTopicNames.CACHE_ASYNC_DELETE_TOPIC);
+                message.setBody(JSON.toJSONString(userCacheAsyncDeleteDTO).getBytes());
+                message.setDelayTimeLevel(1);
+                mqProducer.send(message);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -111,15 +107,11 @@ public class IUserServiceImpl implements IUserService {
      */
     @Override
     public boolean insertOne(UserDTO userDTO) {
-        // 检查用户数据是否为空或用户ID是否为空，因为这些是插入操作所必需的
         if (userDTO == null || userDTO.getUserId() == null) {
-            // 如果为空，则返回false，表示无法进行插入操作
             return false;
         }
-        // 将UserDTO对象转换为UserPO对象，并调用userMapper的insert方法进行数据库插入操作
         int insertStatus = userMapper.insert(ConvertBeanUtils.convert(userDTO, UserPO.class));
         if (insertStatus > -1) {
-            // 如果插入成功，则返回true
             return true;
         }
         return false;
@@ -135,7 +127,6 @@ public class IUserServiceImpl implements IUserService {
      */
     @Override
     public Map<Long, UserDTO> batchQueryUserInfo(List<Long> userIdList) {
-        // 参数检查：如果用户ID列表为空，则直接返回空Map
         if (CollectionUtils.isEmpty(userIdList)) {
             return Maps.newHashMap();
         }

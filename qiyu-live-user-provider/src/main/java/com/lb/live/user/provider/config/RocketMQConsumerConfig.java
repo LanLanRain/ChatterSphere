@@ -1,6 +1,7 @@
 package com.lb.live.user.provider.config;
 
 import com.alibaba.fastjson.JSON;
+import com.lb.live.common.interfaces.topics.UserProviderTopicNames;
 import com.lb.live.user.dto.UserDTO;
 import com.lb.qiyu.live.framework.redis.starter.key.UserProviderCacheKeyBuilder;
 import jakarta.annotation.Resource;
@@ -57,7 +58,7 @@ public class RocketMQConsumerConfig implements InitializingBean {
      */
     public void initConsumer() {
         try {
-            // 初始化我们的RocketMQ消费者
+            // 初始化RocketMQ消费者
             var defaultMQPushConsumer = new DefaultMQPushConsumer();
             // 设置NameServer地址
             defaultMQPushConsumer.setNamesrvAddr(consumerProperties.getNameSrv());
@@ -67,6 +68,7 @@ public class RocketMQConsumerConfig implements InitializingBean {
             defaultMQPushConsumer.setConsumeMessageBatchMaxSize(1);
             // 设置消费位置，从最早的消息开始消费
             defaultMQPushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
+            defaultMQPushConsumer.subscribe(UserProviderTopicNames.CACHE_ASYNC_DELETE_TOPIC, "*");
             // 设置消息监听器，处理消费的消息
             defaultMQPushConsumer.setMessageListener((MessageListenerConcurrently) (msgs, context) -> {
                 // 解析消息内容

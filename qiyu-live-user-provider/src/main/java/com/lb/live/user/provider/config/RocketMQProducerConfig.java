@@ -7,6 +7,7 @@ import org.apache.rocketmq.client.producer.MQProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -35,15 +36,22 @@ public class RocketMQProducerConfig {
      *
      * @return DefaultMQProducer 配置并启动后的MQ生产者实例
      */
+    @Bean
     public MQProducer mqProducer() {
-        //创建一个线程池，用于异步发送消息
-        ThreadPoolExecutor asyncThreadPoolExecutor = new ThreadPoolExecutor(100, 150, 3, TimeUnit.MINUTES,
-                new ArrayBlockingQueue<>(1000), r -> {
-            //定制线程名称，便于识别和调试
+        /**
+         * 创建一个线程池，用于生成特定名称格式的线程，用于异步处理任务。
+         *
+         * @param applicationName 应用程序名称，用于构建线程名称的前缀
+         * @return 返回一个自定义名称格式的线程池
+         */
+        ThreadPoolExecutor asyncThreadPoolExecutor = new ThreadPoolExecutor(100, 150, 3, TimeUnit.MINUTES, new ArrayBlockingQueue<>(1000), r -> {
+            // 创建一个新线程
             Thread thread = new Thread(r);
+            // 使用应用程序名称和随机数来设置线程名称
             thread.setName(applicationName + ":rmq-producer:" + ThreadLocalRandom.current().nextInt(1000));
             return thread;
         });
+
 
         //创建一个默认的MQ生产者实例
         DefaultMQProducer defaultMQProducer = new DefaultMQProducer();

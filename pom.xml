@@ -18,6 +18,8 @@
         <module>qiyu-live-framework</module>
         <module>qiyu-live-framework/qiyu-live-framework-datasource-starter</module>
         <module>qiyu-live-framework/qiyu-live-framework-redis-starter</module>
+        <module>qiyu-live-id-generate-interface</module>
+        <module>qiyu-live-id-generate-provider</module>
     </modules>
 
     <properties>

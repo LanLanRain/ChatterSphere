@@ -79,4 +79,26 @@ call qiyu_live_user.create_t_user_100();
 #
 # select * from t_user_01 where user_id = 1001;
 
+create table `t_id_generate_config` -- 创建一个名为 t_id_generate_config 的表
+(
+    `id`             int not null auto_increment comment '主键',
+    `remark`         varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci default null comment '描述',
+    `next_threshold` bigint                                                        default null comment '当前id所在阶段的阈值',
+    `init_num`       bigint                                                        default null comment '初始值',
+    `current_start`  bigint                                                        default null comment '当前id所在阶段的起始值',
+    `step`           int                                                           default null comment 'id递增区间',
+    `is_seq`         tinyint                                                       default null comment '是否为序列(0-否，1-是)',
+    `id_prefix`      varchar(60) character set utf8mb4 collate utf8mb4_unicode_ci  default null comment '业务前缀码，如果没有则返回时不携带',
+    `version`        int not null                                                  default '0' comment '乐观锁版本号',
+    `create_time`    datetime                                                      default current_timestamp comment '创建时间',
+    `update_time`    datetime                                                      default current_timestamp on update current_timestamp comment '更新时间',
+    primary key (`id`) -- 将 id 字段设置为主键
+) engine = innodb -- 指定存储引擎为 innodb
+  auto_increment = 8 -- 设置自增字段的起始值为 8
+  default charset = utf8mb4 -- 设置默认字符集为 utf8mb4
+  collate utf8mb4_unicode_ci comment = 'id生成策略配置表';
+
+INSERT INTO `t_id_generate_config` (`id`, `remark`, `next_threshold`, `init_num`, `current_start`, `step`, `is_seq`,
+                                    `id_prefix`, `version`, `create_time`, `update_time`)
+VALUES (1, '用户id生成策略', 10050, 10000, 10000, 50, 0, 'user_id', 0, '2023-05-23 12:38:21', '2023-05-23 23:31:45');
 
