@@ -9,6 +9,8 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+import java.util.HashSet;
+
 /**
  * @author RainSoul
  * @create 2024-09-24
@@ -28,8 +30,11 @@ public class IdGenerateApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        HashSet<Long> idSet = new HashSet<>();
         for (int i = 0; i < 1300; i++) {
-            System.out.println("id: " + idGenerateService.getSeqId(1));
+            Long id = idGenerateService.getSeqId(1);
+            idSet.add(id);
         }
+        System.out.println(idSet.size());
     }
 }

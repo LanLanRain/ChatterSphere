@@ -26,12 +26,22 @@ rules:
           standard:
             shardingColumn: user_id  # 分表字段
             shardingAlgorithmName: t_user-inline  # 分表算法名称
+      t_user_tag: # 需要分表的表名称
+        actualDataNodes: user.t_user_tag_${(0..99).collect(){it.toString().padLeft(2,'0')}}  # 实际数据节点，表示t_user表从0到99的分表
+        tableStrategy:
+          standard:
+            shardingColumn: user_id  # 分表字段
+            shardingAlgorithmName: t_user_tag-inline  # 分表算法名称
 
     shardingAlgorithms:  # 分表算法配置
       t_user-inline:
         type: INLINE  # 分表算法类型为内联
         props:
           algorithm-expression: t_user_${(user_id % 100).toString().padLeft(2,'0')}  # 分表表达式，根据user_id取模进行分表
+      t_user_tag-inline:
+        type: INLINE  # 分表算法类型为内联
+        props:
+          algorithm-expression: t_user_tag_${(user_id % 100).toString().padLeft(2,'0')}  # 分表表达式，根据user_id取模进行分表
 
 # 全局配置属性
 props:

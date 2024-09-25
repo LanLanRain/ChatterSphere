@@ -1,7 +1,7 @@
 package com.lb.live.user.provider.rpc;
 
 import com.lb.live.user.dto.UserDTO;
-import com.lb.live.user.interfaces.rpc.IUserRpc;
+import com.lb.live.user.interfaces.IUserRpc;
 import com.lb.live.user.provider.service.IUserService;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;

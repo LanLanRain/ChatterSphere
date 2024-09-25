@@ -1,4 +1,4 @@
-package com.lb.live.user.interfaces.rpc;
+package com.lb.live.user.interfaces;
 
 import com.lb.live.user.dto.UserDTO;
 
